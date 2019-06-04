@@ -205,30 +205,6 @@ namespace alert {
   }
 }
 
-namespace html {
-  export const body = (body: string): string => {
-    return `<html><body>${body}</body></html>`
-  }
-
-  export const codeLiteral = (code: string): string => {
-    return `<pre><code>${code}</code></pre>`
-  }
-
-  export const errorMessage = (message: string): string => {
-    return `<i><pre>${message}</pre></i>`;
-  }
-
-  export const prettyPrintObject = (
-    json: string, outputFormat: "json" | "yaml"
-  ): string => {
-    if (outputFormat == "yaml") {
-      return codeLiteral(yaml.safeDump(JSON.parse(json)));
-    } else {
-      return codeLiteral(JSON.stringify(JSON.parse(json), null, 4));
-    }
-  }
-}
-
 namespace jsonnet {
   export let executable = "jsonnet";
   export const PREVIEW_SCHEME = "jsonnet-preview";
@@ -280,13 +256,13 @@ namespace jsonnet {
   export const canonicalPreviewUri = (fileUri: vs.Uri) => {
     return fileUri.with({
       scheme: jsonnet.PREVIEW_SCHEME,
-      path: `${fileUri.path}.rendered`,
+      path: `Jsonnet preview ${path.basename(fileUri.path)}`,
       query: fileUri.toString(),
     });
   }
 
   export const fileUriFromPreviewUri = (previewUri: vs.Uri): vs.Uri => {
-    const file = previewUri.fsPath.slice(0, -(".rendered".length));
+    const file = previewUri.fsPath;
     return vs.Uri.file(file);
   }
 
@@ -318,11 +294,21 @@ namespace jsonnet {
             ? this.previewCache.get(sourceUri.toString())
             : this.cachePreview(sourceDoc);
           if (isRuntimeFailure(result)) {
-            return html.body(html.errorMessage(result.error));
+            return result.error;
           }
           const outputFormat = workspace.outputFormat();
-          return html.body(html.prettyPrintObject(result, outputFormat));
+          return this.prettyPrintObject(result, outputFormat);
         });
+    }
+
+    private prettyPrintObject = (
+      json: string, outputFormat: "json" | "yaml"
+    ): string => {
+      if (outputFormat == "yaml") {
+        return yaml.safeDump(JSON.parse(json));
+      } else {
+        return JSON.stringify(JSON.parse(json), null, 4);
+      }
     }
 
     public cachePreview = (sourceDoc: vs.TextDocument): RuntimeFailure | string => {
@@ -513,7 +499,7 @@ namespace jsonnet {
 }
 
 namespace display {
-  export const previewJsonnet = (sideBySide: boolean) => {
+  export const previewJsonnet = async (sideBySide: boolean) => {
     const editor = vs.window.activeTextEditor;
     if (editor == null) {
       alert.noActiveWindow();
@@ -528,12 +514,16 @@ namespace display {
 
     const previewUri = jsonnet.canonicalPreviewUri(editor.document.uri);
 
-    return vs.commands.executeCommand(
-      'vscode.previewHtml',
-      previewUri,
-      getViewColumn(sideBySide),
-      `Jsonnet preview '${path.basename(editor.document.fileName)}'`
-    ).then((success) => { }, (reason) => {
+    const outputFormat = workspace.outputFormat();
+
+    await vs.workspace.openTextDocument(previewUri).then(document => {
+      vs.window.showTextDocument(document, {
+        preview: false,
+        preserveFocus: false,
+        viewColumn: getViewColumn(sideBySide)
+      });
+      vs.languages.setTextDocumentLanguage(document, outputFormat);
+    }).then((success) => { }, (reason) => {
       alert.couldNotRenderJsonnet(reason);
     });
   }
@@ -550,14 +540,7 @@ namespace display {
       return active.viewColumn;
     }
 
-    switch (active.viewColumn) {
-      case vs.ViewColumn.One:
-        return vs.ViewColumn.Two;
-      case vs.ViewColumn.Two:
-        return vs.ViewColumn.Three;
-    }
-
-    return active.viewColumn;
+    return vs.ViewColumn.Beside;
   }
 }
 

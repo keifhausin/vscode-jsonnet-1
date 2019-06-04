@@ -25,11 +25,11 @@ package.Default() +
 package.Name(jsonnetLanguage.name) +
 package.DisplayName(jsonnetLanguage.displayName) +
 package.Description("Language support for Jsonnet") +
-package.Version("0.0.15") +
+package.Version("0.1.0") +
 package.Publisher("heptio") +
 package.License("SEE LICENSE IN 'LICENSE' file") +
 package.Homepage("https://github.com/heptio/vscode-jsonnet/blob/master/README.md") +
-package.Category("Languages") +
+package.Category("Programming Languages") +
 package.ActivationEvent(event.OnLanguage(jsonnetLanguage.name)) +
 package.ActivationEvent(event.OnCommand(previewToSide.command)) +
 package.ActivationEvent(event.OnCommand(preview.command)) +
@@ -40,7 +40,7 @@ package.repository.Default(
   "git", "https://github.com/heptio/vscode-jsonnet.git") +
 
 // Engines.
-package.engines.VsCode("^1.10.0") +
+package.engines.VsCode("^1.34.0") +
 
 // Contribution points.
 package.contributes.Language(language.FromLanguageSpec(
@@ -75,19 +75,22 @@ package.contributes.DefaultConfiguration(
     test: "node ./node_modules/vscode/bin/test"
   },
   dependencies: {
+    filepath: "^1.1.0",
     "js-yaml": "^3.0.0",
     "immutable": "^3.8.1",
-    "vscode-languageclient": "^3.1.0",
-    "vscode-languageserver": "^3.1.0",
+    "vscode-languageclient": "^5.2.1",
+    "vscode-languageserver": "^5.2.1",
   },
   devDependencies: {
     browserify: "^14.3.0",
-    typescript: "^2.3.2",
-    vscode: "^1.0.0",
-    mocha: "^2.3.3",
     chai: "^3.5.0",
+    mocha: "^5.0.1",
+    tslint: "^5.16.0",
+    typescript: "^3.4.5",
+    vscode: "^1.1.28",
     "@types/chai": "^3.5.0",
-    "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.10.25",
+    "@types/vscode": "^1.34.0",
   }
 }
