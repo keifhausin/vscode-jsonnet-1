@@ -95,7 +95,6 @@
         "tslint": "^5.16.0",
         "typescript": "^3.4.5",
         "@types/node": "^14.0.13",
-
         "vscode": "^1.1.28"
     },
     "displayName": "Jsonnet",
