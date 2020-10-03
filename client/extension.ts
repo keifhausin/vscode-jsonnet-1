@@ -340,7 +340,7 @@ namespace jsonnet {
         const extStrs = workspace.extStrs();
         const libPaths = workspace.libPaths();
         const jsonOutput = execSync(
-          `${jsonnet.executable} ${libPaths} ${extStrs} ${codePaths} ${sourceFile}`
+          `${jsonnet.executable} ${libPaths} ${extStrs} ${codePaths} "${sourceFile}"`
         ).toString();
 
         // Cache.

@@ -33,6 +33,17 @@
             "preLaunchTask": "npm"
         },
         {
+            "name": "Launch Extension webpack",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [ "${workspaceRoot}/dist/extention.js" ],
+            "preLaunchTask": "npm"
+        },
+        {
             "name": "Attach to TS Server",
             "type": "node",
             "request": "attach",
@@ -51,6 +62,18 @@
             "sourceMaps": true,
             "outFiles": [ "${workspaceRoot}/out/test/**/*.js" ],
             "preLaunchTask": "npm"
-        }
+        },
+        {
+            "name": "Extension Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+              "--extensionDevelopmentPath=${workspaceFolder}",
+              "--extensionTestsPath=${workspaceFolder}/out/test"
+            ],
+            "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+            "preLaunchTask": "npm: test-compile"
+          }
     ]
 }
